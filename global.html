@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Global - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#WGuidechart">WGuidechart</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Global</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="WGuidechart"><span class="type-signature type-signature-async">(async) </span>WGuidechart<span class="signature">(conf, opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>功能指引圖之取景、排版與繪製: 於網頁畫面之截圖上, 以紅框圈選各功能區, 以雙段灰色引線(斜線＋水平線)指至四周, 並於水平線上方寫功能文字</p>
+<p>流程: 檢測全部輸入(無效即 reject E_ARG, 無任何副作用) → 解析 opt.names → (未取景時先驗資料檔) → 建立輸出資料夾 → env.launchBrowser() →
+opt.capture 為 true 時逐圖取景(截圖不含紅框並量框, 寫 <dirWork>/shots/&lt;名稱&gt;.png、data/&lt;名稱&gt;.json) → 逐圖繪製(寫 svg/&lt;名稱&gt;.svg、<dirPng>/&lt;名稱&gt;.png、data/&lt;名稱&gt;.layout.json) → 關閉瀏覽器(恰一次, 含 reject 路徑)</p>
+<p>信任邊界: conf 為程式碼。env.launchBrowser、env.openPage、view.open、env.afterCapture 以使用端之權限於 Node 執行, find.fn 於被截圖之頁面內執行(經 Playwright 之 page.evaluate 序列化, 須自足, 參數經 find.arg 傳入);
+套件不從資料檔或網路取得任何會被執行之內容, 不動態執行字串。瀏覽器由使用端注入(Playwright 相容之 Browser), 套件執行期不依賴 playwright</p>
+<p>失敗通道: 一律 reject Error 並帶 code(E_ARG、E_VIEW_NOT_FOUND、E_BROWSER、E_OPEN、E_SETTLE、E_BOX_NOT_FOUND、E_NOT_CAPTURED、E_STALE、E_DATA、E_CROP、E_FS);
+訊息為固定英文詞彙且只帶路徑索引(如 invalid conf.views[2].name: must be a safe file name …), 不回顯輸入值; 使用端回呼或瀏覽器之錯誤經 wsemi maskDiagErr 後掛為 cause。
+排版之「問題」不 reject: 圖照常輸出, 問題列於 issues(使用端自行決定離開碼)</p>
+<p>輸入之種類(dspec〈輸入參數之檢測機制〉; 全表見 README 與 sgud/rule/rulebook.md 之 R-GC-ARG): conf 之必給鍵無效即 reject E_ARG; 選填鍵(含 style、layout、capture、功能區之覆寫、opt 各鍵)無效時視為未給、改用預設, opt.debug 為 true 時經 opt.funLog('warn', { msg }) 或 console.warn 警告(不含值)</p>
+<p>Unit Test: <a href="https://github.com/yuda-lyu/w-guidechart/blob/master/test/api-WGuidechart.test.mjs">Github</a></p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WGuidechart.mjs.html">WGuidechart.mjs</a>, <a href="WGuidechart.mjs.html#line82">line 82</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-examples">Example</h5>
+    
+    <pre class="prettyprint"><code>import { chromium } from 'playwright' //使用端自備
+import WGuidechart from 'w-guidechart'
+
+let conf = {
+    dirWork: './guide-work',
+    env: { launchBrowser: () => chromium.launch() },
+    views: [{
+        name: 'home',
+        open: (page) => page.goto('http://localhost:8000/'),
+        regions: [{ label: '查詢列', find: { sel: '.toolbar' } }],
+    }],
+}
+let res = await WGuidechart(conf, { capture: true })
+if (res.some((r) => r.issues.length > 0)) {
+    process.exitCode = 1
+}</code></pre>
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conf</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入設定物件(一般物件, 必給)</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dirWork</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入工作資料夾字串(路徑, 必給; 相對路徑以 cwd 解析), shots/、data/、svg/ 置於其下</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dirPng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入 png 輸出資料夾字串(路徑), 預設 <dirWork>/png</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>env</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入環境物件(必給)</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>launchBrowser</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入啟動瀏覽器函數(必給), 回傳 Playwright 相容之 Browser(須有 newPage、close); 取景與繪製共用, 套件用完即 close</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>openPage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入開頁函數(browser, view) =&gt; page(view 為使用端之原物件), 預設 browser.newPage({ viewport: 1600×900, deviceScaleFactor: 1 }); 頁面之 deviceScaleFactor 須為 1(截圖與視窗尺寸不同即 reject E_OPEN); 每圖取景後關閉該頁之 context</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>helpers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入任意值, 原樣交給 view.open 之第 2 參數</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>afterCapture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入取景後之回呼(page) =&gt; {}, 預設不呼叫</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入全域樣式(鍵見 WGuidechart.defaultStyle), 各鍵無效改用預設; shadow 為 null 不加陰影, 為物件則逐鍵合併</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入全域排版設定(鍵見 WGuidechart.defaultLayout), 各鍵無效改用預設</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>capture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入取景設定</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mousePark</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>[1000, 4]</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入取景前滑鼠停放之點 <a href="%E9%9D%9E%E8%B2%A0%E6%95%B8">x, y</a>, null 為不停放; 超出視窗者該圖不停放</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>settle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>'stable'</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入穩定之判定, 'stable' 為字型就緒、雙 rAF 後連續兩次截圖相同; 'fonts' 為只等字型就緒與雙 rAF(供持續動畫之頁面)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>settleMs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>5000</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入穩定等待之上限毫秒(正數, 至多 2147483647), 逾時 reject E_SETTLE</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>views</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入各圖之陣列(非空, 必給), 每圖 { name, open, regions, crop, style, layout }, 其餘鍵(如 cap)套件不讀</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入圖名(安全檔名: 英數開頭, 只含英數與 . _ -, 至多 100 字元, 非 Windows 保留名, 不以 . 或 .layout 結尾; 全部 views 唯一, 不分大小寫)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>open</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入開至取景狀態之函數(page, helpers) =&gt; Promise</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>regions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入功能區陣列(可空), 每區 { label, find, side, ax, anchor, tier, x, dx, join }</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>crop</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>輸入裁切 [x1, y1, x2, y2](非負整數, x1&lt;x2、y1&lt;y2), 預設全畫面; 超出截圖或功能區落在裁切外時 reject E_CROP</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>{}</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入設定物件, 非一般物件視為 {}</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>capture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入是否先取景再繪製</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>names</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入只處理之圖名陣列, 預設全部; 有不存在之名稱時 reject E_VIEW_NOT_FOUND</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debug</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入是否警告被改用預設之鍵</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>funLog</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入進度與警告之接收函數(label, info) =&gt; {}, label 為 'capture'、'render'、'warn'; 預設不輸出</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onTrace</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>輸入觀察回調(e) =&gt; {}, e 為凍結之 { type, ... }; type 為 view-open、settle-fonts、settle-sample、settled、settle-timeout、shot、measured、captured、layout、rendered; 預設 null</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>回傳 Promise, resolve 為各圖之結果陣列 [{ name, w, h, issues, notes, decisions, files: { shot, data, layout, svg, png } }], issues、notes 為 [{ code, msg, regions }]; reject 為帶 code 之 Error</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Thu Nov 12 2026 20:12:49 GMT+0800 (台北標準時間) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
