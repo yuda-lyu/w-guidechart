@@ -4,7 +4,7 @@
 
 - 需求出處:使用端之 Gitea #133(功能指引圖之取景、排版與繪製;原型 3 檔約 900 行);設計與裁定見主控任務 20261112180920 之設計報告(7 點與 D-2、D-3).
 - 測試指令:全套 `npm test`;單檔 `npx mocha --no-parallel "test/<檔>" --timeout 180000`.本套件無 `e2e-`(無使用者 UI),不開埠.
-- 改動範圍 → 測試檔:`src/layout.mjs`、`genSvg.mjs`、`defaults.mjs` → `unit-layout`(另跑 L3 等價比對,見 R-GC-LAYOUT-00);頁面內函式(`*InPage.mjs`)→ `unit-measureInPage`、`unit-dist`、`api-WGuidechart`;`parseConf.mjs` → `unit-conf`;`waitSettle.mjs` → `unit-waitSettle`、`api-WGuidechart`;`WGuidechart.mjs`、`capture.mjs`、`render.mjs`、`mkErr.mjs` → `api-WGuidechart`;`toolg/gDistRollup.mjs`、`package.json` → `unit-dist`、`unit-pkg`.
+- 改動範圍 → 測試檔:`src/layout.mjs`、`genSvg.mjs`、`defaults.mjs` → `unit-layout`(另跑 L3 等價比對,見 R-GC-LAYOUT-00);頁面內函式(`*InPage.mjs`)→ `unit-measureInPage`、`unit-dist`、`api-WGuidechart`;`parseConf.mjs` → `unit-conf`;`waitSettle.mjs` → `unit-waitSettle`、`api-WGuidechart`;`WGuidechart.mjs`、`capture.mjs`、`render.mjs`、`mkErr.mjs` → `api-WGuidechart`;`toolg/gDistRollup.mjs`、`package.json` → `unit-dist`、`unit-pkg`;`test/tools/launch.mjs`(測試啟動瀏覽器之唯一啟動點)→ 全部啟動瀏覽器之測試(`api-WGuidechart`、`api-wpwWiring`、`unit-dist`、`unit-measureInPage`)與 `unit-pkg`.
 
 ## 一、排版(R-GC-LAYOUT)
 
@@ -144,9 +144,25 @@
 
 ## 六、套件與建置(R-GC-PKG、R-GC-DIST)
 
-- **R-GC-PKG-01**:`dependencies` 只有 `wsemi`(層級 4);`playwright` 列 devDependencies 供測試;不依 sharp;`scripts` 之測試類只有 `test`.測試:`unit-pkg`.
+- **R-GC-PKG-01**:`dependencies` 只有 `wsemi`(層級 4);`w-playwright`(`^1.0.1`)列 devDependencies 供測試啟動瀏覽器;`playwright`、`playwright-core` 不得出現在任何依賴類別(`dependencies`、`devDependencies`、`peerDependencies`、`optionalDependencies`、`overrides`);不依 sharp;`scripts` 之測試類只有 `test`.測試:`unit-pkg`.
+- **R-GC-PW-01 Chromium 系之啟動一律經 w-playwright**(排程第 442 項;對應 w-playwright 帳本 R-PW-ONLY、R-PW-WIRING;背景:Chromium 153 起每啟動一個新根行程即使 Windows 錯誤密碼次數 +1,w-playwright 於每次啟動合併出含守門功能之恰一串 `--disable-features`):
+  1. `src` 不啟動瀏覽器(由使用端注入 `env.launchBrowser`);JSDoc 與 README 之範例寫注入形式 `launchBrowser: () => wpw.launchChromium()`,並寫明 Chromium 系須經 w-playwright(安裝、`ensureChromium()`、離線 `PLAYWRIGHT_BROWSERS_PATH`、真 Chrome／Edge 須自行安裝、守門參數與原因、`PWDEBUG`／`SELENIUM_REMOTE_URL` 不支援).
+  2. R-PW-ONLY:`src`、`test`、`toolg` 之 `.mjs`／`.js`(含註解與 JSDoc 範例,不設註解例外;不含 `test/_tmp`)無直接匯入 `playwright`／`playwright-core`(靜態、動態 `import()`、`require`).盤點指令見本條末之區塊(須 0 命中).
+  3. 啟動點全集:`src` 無;測試只有 `test/tools/launch.mjs` 之 `launchTestBrowser`(唯一啟動點,`wpw.launchChromium()`,headless shell;`makeLauncher` 與各測試檔皆呼叫它)與 `test/api-wpwWiring.test.mjs`(README 範例形式).盤點:`unit-pkg` 之啟動點全集案(去註解後掃 `launchChromium(Persistent)?(`、`chromium.launch`,結果須恰為此二檔).
+  4. 接線(R-PW-WIRING):`api-wpwWiring` 以 `wpw.setBrowserTypeForTest` 之替身斷言①唯一啟動點與 `makeLauncher` 皆經 w-playwright(替身呼叫次數 >0,收到之合併後選項 `args` 末元素為恰一串 `--disable-features` 且含 `AutofillAiWalletPrivatePasses`、無頭、未指定 `channel`／`executablePath`);②README 範例形式注入 `WGuidechart` 跑全流程,替身以 `next()` 走真路徑(真啟動 headless shell),啟動恰 1 次、選項含守門、5 檔皆在.變異:M1 唯一啟動點不經 w-playwright → `api-wpwWiring` 與 `unit-pkg` 啟動點全集案轉紅;M2 `toolg` 匯入 `playwright-core` → `unit-pkg` R-PW-ONLY 案轉紅(2026-11-13 實跑).
+  5. 本套件之測試只啟動 headless shell(無頭、不指定通道;錯誤密碼次數 +0),不啟動真 Chrome、Edge、完整 Chromium,故無 `findSystemChrome` 探測;日後若新增真瀏覽器測試,須經 w-playwright、每檔至多啟動一次(`before` 起、`after` 關)、跑前後讀錯誤密碼次數.
+  測試:`unit-pkg`(R-PW-ONLY 2 案、R-GC-PW-01 啟動點全集、R-GC-PKG-01)、`api-wpwWiring` 2 案.
+
+```
+rg -n --glob '*.{mjs,js}' --glob '!**/node_modules/**' --glob '!**/dist/**' "(from\s+|import\(\s*|require\(\s*)['\"\`]playwright(-core)?['\"\`/]" src test toolg
+rg -n --glob '**/package.json' --glob '!**/node_modules/**' "\"playwright(-core)?\"\s*:" .
+```
+
+  防空集合:同一指令對 w-playwright 之 `src/_pw.mjs` 必命中(該套件為允許清單,僅作指令有效性之正例).`docs/` 為發布流程(jsdoc)之產物,不在掃描範圍,下次發布重產.
 - **R-GC-DIST-01**:`toolg/gDistRollup.mjs` 依〈自有套件之發布與建置腳本〉標準寫法(`'./src'`、`'./dist'`,`fns: 'WGuidechart.mjs'`,`runin: 'nodejs'`,external／globals 只有 `fs`、`path`);測試以副本指定 cwd 執行該腳本,再以 dist 跑合成頁全流程(含裁切),layout.json、截圖、svg 與 src 相同.測試:`unit-dist` 4 案.
 
 ## 七、破壞性變更紀錄(相對原型)
 
 原型未發布,依原則 14 不設相容層:具名匯出 8 個 → default 1 個;`runCli` 刪除;`find.fn` 由字串改函數＋`arg`;issues、notes 由字串改物件;union 收嚴;`settleMs` 由固定等待改上限(預設 5000);`dirPng`、`env.openPage` 改選填;繪製亦用注入之瀏覽器;進度改經 `funLog`.
+
+遷移輪(排程第 442 項,2026-11-13):對外 API 與 `src` 邏輯不變;測試、README、JSDoc 範例之啟動改經 w-playwright,dev 依賴由 `playwright` 改為 `w-playwright`(R-GC-PW-01).

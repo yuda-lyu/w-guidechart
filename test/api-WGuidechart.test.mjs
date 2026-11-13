@@ -1,12 +1,11 @@
-//公開入口 WGuidechart 之整合測試: 真 Chromium(launchBrowser 為真 chromium.launch, 外包一層只計關閉次數; 接縫不用替身)加真檔案系統, 合成之示範頁
+//公開入口 WGuidechart 之整合測試: 真 Chromium(headless shell; launchBrowser 為經 w-playwright 之真啟動, 外包一層只計關閉次數; 接縫不用替身)加真檔案系統, 合成之示範頁
 //  每條斷言註明對應之帳本條目(sgud/rule/rulebook.md); 等待之測試以觀察回調之事件與入口之完成為同步點, 不以延時
 import fs from 'fs'
 import path from 'path'
 import assert from 'assert'
-import { chromium } from 'playwright'
 import WGuidechart from '../src/WGuidechart.mjs'
 import { demoHtml, animHtml, demoRegions } from './tools/demoPage.mjs'
-import { makeLauncher, makeRecorder } from './tools/launch.mjs'
+import { launchTestBrowser, makeLauncher, makeRecorder } from './tools/launch.mjs'
 import { pngSizeOf } from './tools/png.mjs'
 
 
@@ -36,7 +35,7 @@ describe('api-WGuidechart', function() {
 
     before(async function() {
         fs.rmSync(fdTmp, { recursive: true, force: true })
-        browser = await chromium.launch()
+        browser = await launchTestBrowser()
     })
 
     after(async function() {

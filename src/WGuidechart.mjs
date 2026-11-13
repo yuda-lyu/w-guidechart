@@ -24,7 +24,7 @@ let deepFreeze = (o) => {
  * opt.capture 為 true 時逐圖取景(截圖不含紅框並量框, 寫 <dirWork>/shots/<名稱>.png、data/<名稱>.json) → 逐圖繪製(寫 svg/<名稱>.svg、<dirPng>/<名稱>.png、data/<名稱>.layout.json) → 關閉瀏覽器(恰一次, 含 reject 路徑)
  *
  * 信任邊界: conf 為程式碼。env.launchBrowser、env.openPage、view.open、env.afterCapture 以使用端之權限於 Node 執行, find.fn 於被截圖之頁面內執行(經 Playwright 之 page.evaluate 序列化, 須自足, 參數經 find.arg 傳入);
- * 套件不從資料檔或網路取得任何會被執行之內容, 不動態執行字串。瀏覽器由使用端注入(Playwright 相容之 Browser), 套件執行期不依賴 playwright
+ * 套件不從資料檔或網路取得任何會被執行之內容, 不動態執行字串。瀏覽器由使用端注入(Playwright 相容之 Browser; Chromium 系須經 w-playwright 啟動), 套件執行期不依賴 playwright、w-playwright
  *
  * 失敗通道: 一律 reject Error 並帶 code(E_ARG、E_VIEW_NOT_FOUND、E_BROWSER、E_OPEN、E_SETTLE、E_BOX_NOT_FOUND、E_NOT_CAPTURED、E_STALE、E_DATA、E_CROP、E_FS);
  * 訊息為固定英文詞彙且只帶路徑索引(如 invalid conf.views[2].name: must be a safe file name …), 不回顯輸入值; 使用端回呼或瀏覽器之錯誤經 wsemi maskDiagErr 後掛為 cause。
@@ -37,7 +37,7 @@ let deepFreeze = (o) => {
  * @param {String} conf.dirWork 輸入工作資料夾字串(路徑, 必給; 相對路徑以 cwd 解析), shots/、data/、svg/ 置於其下
  * @param {String} [conf.dirPng] 輸入 png 輸出資料夾字串(路徑), 預設 <dirWork>/png
  * @param {Object} conf.env 輸入環境物件(必給)
- * @param {Function} conf.env.launchBrowser 輸入啟動瀏覽器函數(必給), 回傳 Playwright 相容之 Browser(須有 newPage、close); 取景與繪製共用, 套件用完即 close
+ * @param {Function} conf.env.launchBrowser 輸入啟動瀏覽器函數(必給), 回傳 Playwright 相容之 Browser(須有 newPage、close); 取景與繪製共用, 套件用完即 close; 使用 Chromium 系瀏覽器者須經 w-playwright 啟動(如 () => wpw.launchChromium(), 其一律加入之守門參數見 README)
  * @param {Function} [conf.env.openPage] 輸入開頁函數(browser, view) => page(view 為使用端之原物件), 預設 browser.newPage({ viewport: 1600×900, deviceScaleFactor: 1 }); 頁面之 deviceScaleFactor 須為 1(截圖與視窗尺寸不同即 reject E_OPEN); 每圖取景後關閉該頁之 context
  * @param {*} [conf.env.helpers] 輸入任意值, 原樣交給 view.open 之第 2 參數
  * @param {Function} [conf.env.afterCapture] 輸入取景後之回呼(page) => {}, 預設不呼叫
@@ -61,12 +61,12 @@ let deepFreeze = (o) => {
  * @returns {Promise} 回傳 Promise, resolve 為各圖之結果陣列 [{ name, w, h, issues, notes, decisions, files: { shot, data, layout, svg, png } }], issues、notes 為 [{ code, msg, regions }]; reject 為帶 code 之 Error
  * @example
  *
- * import { chromium } from 'playwright' //使用端自備
+ * import wpw from 'w-playwright' //使用端自備(npm i w-playwright); 啟動瀏覽器一律經 w-playwright, 不直接用 playwright／playwright-core
  * import WGuidechart from 'w-guidechart'
  *
  * let conf = {
  *     dirWork: './guide-work',
- *     env: { launchBrowser: () => chromium.launch() },
+ *     env: { launchBrowser: () => wpw.launchChromium() },
  *     views: [{
  *         name: 'home',
  *         open: (page) => page.goto('http://localhost:8000/'),

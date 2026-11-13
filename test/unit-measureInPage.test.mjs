@@ -1,11 +1,11 @@
 //頁面內之函式(量框 measureInPage、字寬 measureTextInPage、裁切 cropInPage)之測試: 真 Chromium, 以 page.evaluate 執行 src 之函式
 //  (函式若引用模組層識別字, 於頁面內即 ReferenceError, 故本檔亦證其自足, R-GC-PAGE-01); 頁面為合成之示範頁(視窗 1600×900)
 import assert from 'assert'
-import { chromium } from 'playwright'
 import measureInPage from '../src/measureInPage.mjs'
 import measureTextInPage from '../src/measureTextInPage.mjs'
 import cropInPage from '../src/cropInPage.mjs'
 import { demoHtml } from './tools/demoPage.mjs'
+import { launchTestBrowser } from './tools/launch.mjs'
 
 
 describe('unit-measureInPage', function() {
@@ -19,7 +19,7 @@ describe('unit-measureInPage', function() {
     let m = (find) => page.evaluate(measureInPage, find)
 
     before(async function() {
-        browser = await chromium.launch()
+        browser = await launchTestBrowser()
         page = await browser.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 })
         await page.setContent(demoHtml())
     })

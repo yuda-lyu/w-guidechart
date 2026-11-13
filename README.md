@@ -14,29 +14,37 @@ To view documentation or get support, visit [docs](https://yuda-lyu.github.io/w-
 ## Core
 > 功能指引圖之取景、排版與繪製:於網頁畫面之截圖上,以紅框圈選各功能區,以雙段灰色引線(斜線＋水平線)指至四周,並於水平線上方寫功能文字。輸出 svg(內嵌截圖並加陰影,可再以 Inkscape 微調)、png,以及各標籤之排版結果(可照抄為覆寫值)。
 
-> 瀏覽器由使用端注入(`conf.env.launchBrowser`,回傳 Playwright 相容之 Browser),取景與繪製共用,套件用完即關閉;套件執行期只依賴 `wsemi`,不依賴 `playwright`、`sharp`。使用端自備 `playwright` 與其瀏覽器(`npx playwright install chromium`)。
+> 瀏覽器由使用端注入(`conf.env.launchBrowser`,回傳 Playwright 相容之 Browser),取景與繪製共用,套件用完即關閉;套件執行期只依賴 `wsemi`,不依賴 `playwright`、`w-playwright`、`sharp`。使用 Chromium 系瀏覽器者,**一律經自有套件 [w-playwright](https://www.npmjs.com/package/w-playwright) 啟動**(`wpw.launchChromium()`),不直接使用 `playwright`／`playwright-core`。
 
-> 只在 Windows 11 以 Chromium 實跑驗證;字寬以繪製時之瀏覽器量測,輸出隨使用端之瀏覽器版本與系統字型而變。
+> 只在 Windows 11 以 Chromium(Playwright 之 headless shell)實跑驗證;字寬以繪製時之瀏覽器量測,輸出隨使用端之瀏覽器版本與系統字型而變。
 
 ## Installation
 
 ### Using npm(ES6 module):
 ```alias
 npm i w-guidechart
-npm i -D playwright
-npx playwright install chromium
+npm i w-playwright
 ```
 
-> 使用端須自備 `playwright`(本套件以 `^1.64.1` 驗證)與其瀏覽器;瀏覽器由 `npx playwright install chromium` 下載至 playwright 之快取目錄。離線環境:於可連網之機器以同版 playwright 執行上列指令,把其瀏覽器資料夾複製至目標機,並以環境變數 `PLAYWRIGHT_BROWSERS_PATH` 指向該資料夾。
+1. **瀏覽器之啟動工具**:`w-playwright` 由使用端安裝(本套件不依賴它);其 `dependencies` 以精確版本帶入 `playwright-core` 1.64.1,使用端不需、也不應另裝 `playwright` 或 `playwright-core`,更**不要用 `npx playwright install`**(依賴樹中他版被提升時會下載到不同版本之瀏覽器)。
+2. **受管瀏覽器之取得**(預設無頭,用 Playwright 之 headless shell):於使用端程式內執行一次 `await wpw.ensureChromium()`;需完整 Chromium 時 `await wpw.ensureChromium({ kind: 'chromium' })`。`w-playwright` 預設不自動下載(未安裝而啟動即 `E_BROWSER_MISSING`),亦可於啟動時給 `autoInstall: true`。
+3. **離線環境**:於可連網之機器以同版 `w-playwright` 執行 `ensureChromium()`,把 Playwright 之瀏覽器資料夾(Windows 預設 `%LOCALAPPDATA%\ms-playwright`)複製至目標機,並以環境變數 `PLAYWRIGHT_BROWSERS_PATH` 指向該資料夾;**此變數須在載入 `w-playwright` 之前設定**(執行期改動不生效)。
+4. **用真 Chrome／Edge 者須自行安裝 Google Chrome／Microsoft Edge**(`wpw.launchChromium({ channel: 'chrome' })`,Edge 為 `'msedge'`);`wpw.findSystemChrome()` 只以檔案存在判定其位置,不啟動、不代表可啟動。
+5. **w-playwright 一律加入之守門參數**:Windows 上 Chromium 153 起,每啟動一個新的瀏覽器根行程,即以無效密碼替目前使用者呼叫一次 `LogonUser`(安全性紀錄 4625、錯誤密碼次數 +1;本機原則連續數次即鎖定帳號)。`w-playwright` 於每次啟動之命令列**恰給一個** `--disable-features`(Playwright 預設清單＋`AutofillAiWalletPrivatePasses`＋呼叫端自給者)以停用該行為,不提供停用此守門之選項;headless shell 本即不觸發。細節見 `w-playwright` 之 README。
+6. **不支援之環境**:`PWDEBUG` 為 inspector 模式之值、`SELENIUM_REMOTE_URL` 有值時,`w-playwright` 拒絕啟動(`E_ENV`)。
+
+> 注入之 `launchBrowser` 若以 Chromium 系瀏覽器實作,須注入 `w-playwright` 之啟動函數,不得注入未經 `w-playwright` 之啟動(會使守門失效)。本套件自身之測試亦只經 `w-playwright` 啟動 headless shell。
 
 #### Example:
 ```alias
-import { chromium } from 'playwright' //使用端自備(或任何 Playwright 相容之 Browser)
+import wpw from 'w-playwright' //使用端自備(npm i w-playwright); 或任何 Playwright 相容之 Browser, 但 Chromium 系須經 w-playwright 啟動
 import WGuidechart from 'w-guidechart'
+
+await wpw.ensureChromium() //取得受管之 headless shell(只需在該機器未安裝時執行)
 
 let conf = {
     dirWork: './guide-work', //必給; shots/、data/、svg/ 置於其下(相對路徑以 cwd 解析)
-    env: { launchBrowser: () => chromium.launch() }, //必給; 取景與繪製共用, 套件用完即 close
+    env: { launchBrowser: () => wpw.launchChromium() }, //必給; 取景與繪製共用, 套件用完即 close
     views: [{
         name: 'home', //必給; 安全檔名, 全部 views 唯一
         open: (page, helpers) => page.goto('http://localhost:8000/'), //必給; 開到取景之狀態(資料載完、動畫停止等由此處自等)

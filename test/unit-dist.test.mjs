@@ -5,9 +5,9 @@ import path from 'path'
 import assert from 'assert'
 import { builtinModules, createRequire } from 'module'
 import { spawnSync } from 'child_process'
-import { chromium } from 'playwright'
 import WGuidechartSrc from '../src/WGuidechart.mjs'
 import { demoHtml, demoRegions } from './tools/demoPage.mjs'
+import { launchTestBrowser } from './tools/launch.mjs'
 
 
 describe('unit-dist', function() {
@@ -47,13 +47,13 @@ describe('unit-dist', function() {
         assert.ok(fs.existsSync(path.join(fdOk, main)))
     })
 
-    it('dist 之外部模組只有 Node 內建與 dependencies; 不 require playwright、sharp', function() {
+    it('dist 之外部模組只有 Node 內建與 dependencies; 不 require playwright、playwright-core、w-playwright、sharp(瀏覽器由使用端注入)', function() {
         let c = fs.readFileSync(path.join(fdOk, 'dist', 'w-guidechart.umd.js'), 'utf8')
         let reqs = [...new Set([...c.matchAll(/require\("([^"]+)"\)/g)].map((m) => m[1]))]
         let deps = Object.keys(JSON.parse(fs.readFileSync(path.join(fdRepo, 'package.json'), 'utf8')).dependencies)
         assert.ok(reqs.length > 0)
         assert.deepStrictEqual(reqs.filter((m) => !builtinModules.includes(m) && !deps.includes(m)), [])
-        assert.ok(!reqs.includes('playwright') && !reqs.includes('sharp'))
+        assert.ok(!reqs.some((m) => ['playwright', 'playwright-core', 'w-playwright', 'sharp'].includes(m)))
     })
 
     it('dist 以 require 載入為函數, 只帶靜態之 defaultStyle、defaultLayout(深凍結, 與 src 相同)', function() {
@@ -69,7 +69,7 @@ describe('unit-dist', function() {
         let W = createRequire(import.meta.url)(path.join(fdOk, 'dist', 'w-guidechart.umd.js'))
         let mk = (dirWork) => ({
             dirWork,
-            env: { launchBrowser: () => chromium.launch() },
+            env: { launchBrowser: () => launchTestBrowser() },
             views: [
                 { name: 'demo-main', open: (page) => page.setContent(demoHtml()), regions: demoRegions() },
                 { name: 'demo-crop', crop: [300, 100, 1400, 800], open: (page) => page.setContent(demoHtml()), regions: demoRegions().filter((g) => ['查詢列', '圖區', '分頁列'].includes(g.label)) },
