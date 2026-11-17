@@ -1,9 +1,9 @@
 {
   "name": "w-guidechart",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "dist/w-guidechart.umd.js",
   "dependencies": {
-    "wsemi": "^1.9.63"
+    "wsemi": "^1.9.64"
   },
   "devDependencies": {
     "w-package-tools": "^1.1.28",
