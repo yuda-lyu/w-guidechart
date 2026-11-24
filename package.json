@@ -1,13 +1,13 @@
 {
   "name": "w-guidechart",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "main": "dist/w-guidechart.umd.js",
   "dependencies": {
-    "wsemi": "^1.9.73"
+    "wsemi": "^1.9.74"
   },
   "devDependencies": {
-    "w-package-tools": "^1.1.29",
-    "w-playwright": "^1.0.3"
+    "w-package-tools": "^1.1.30",
+    "w-playwright": "^1.0.4"
   },
   "scripts": {
     "test": "mocha --parallel \"test/*.test.mjs\" --timeout 180000",
